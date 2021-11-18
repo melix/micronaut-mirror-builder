@@ -22,7 +22,7 @@ val micronautCli by configurations.creating {
         attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
     }
     dependencies.addLater(project.provider {
-        project.dependencies.create("io.micronaut.starter:micronaut-micronaut-cli:${extension.micronautVersion}")
+        project.dependencies.create("io.micronaut.starter:micronaut-micronaut-cli:${extension.micronautVersion.get()}")
     })
 }
 
