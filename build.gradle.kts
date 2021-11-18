@@ -12,4 +12,6 @@ mirroring {
             "oracle-function",
             "reactor",
     ))
+    extraDependencies.put("implementation", listOf("info.picocli:picocli"))
+    extraDependencies.put("annotationProcessor", listOf("info.picocli:picocli-codegen"))
 }

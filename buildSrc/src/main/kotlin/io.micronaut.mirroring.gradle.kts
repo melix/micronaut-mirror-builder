@@ -33,6 +33,8 @@ val archiveOperations = serviceOf<ArchiveOperations>()
 
 val generateGradle = tasks.register<JavaExec>("generateMicronautGradleProject") {
     outputs.dir(gradleProjectDir)
+    inputs.property("features", extension.features)
+    inputs.property("extraDependencies", extension.extraDependencies)
     mainClass.set("io.micronaut.starter.cli.MicronautStarter")
     classpath = micronautCli
     args(listOf("create-app", "demo",
@@ -45,6 +47,20 @@ val generateGradle = tasks.register<JavaExec>("generateMicronautGradleProject") 
         fileOperations.delete(gradleProjectDir.map { it.dir("demo") })
     }
     doLast {
+        val extraDeps = extension.extraDependencies.get()
+        if (extraDeps.isNotEmpty()) {
+            val buildFile = gradleProjectDir.get().file("demo/build.gradle").asFile
+            val depsBlock = extraDeps.map { e ->
+                val scope = e.key
+                val deps = e.value
+                deps.map { d -> "    ${scope}(\"${d}\")" }.joinToString("\n")
+            }.joinToString("\n")
+            buildFile.appendText("""
+                dependencies {
+                $depsBlock                                                   
+                }
+            """.trimIndent())
+        }
         val testContainersProperties = gradleProjectDir.get().file("demo/src/test/resources/testcontainers.properties").asFile
         testContainersProperties.parentFile.mkdir()
         testContainersProperties.writeText("""
